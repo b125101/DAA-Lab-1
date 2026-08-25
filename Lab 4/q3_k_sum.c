@@ -1,5 +1,83 @@
 #include <stdio.h>
 #include <stdlib.h>
-int cmp(const void*a,const void*b){int x=*(const int*)a,y=*(const int*)b;return (x>y)-(x<y);}
-int search2(int*a,int l,int r,long long t){while(l<r){long long s=(long long)a[l]+a[r];if(s==t)return 1;if(s<t)l++;else r--;}return 0;}
-int main(){int n,k,T;scanf("%d %d %d",&n,&k,&T);int*a=malloc(n*sizeof(int));for(int i=0;i<n;i++)scanf("%d",&a[i]);qsort(a,n,sizeof(int),cmp);int found=0; if(k==2) found=search2(a,0,n-1,T); else if(k==3){for(int i=0;i<n-2&&!found;i++){int l=i+1,r=n-1;while(l<r){long long s=(long long)a[i]+a[l]+a[r];if(s==T){found=1;break;}if(s<T)l++;else r--;}}} else {printf("This implementation supports k = 2 or 3.\n");free(a);return 0;}printf(found?"A valid combination exists.\n":"No valid combination exists.\n");free(a);return 0;}
+
+int compare(const void *a, const void *b) {
+    return (*(int *)a - *(int *)b);
+}
+
+int binarySearch(int arr[], int n, int key) {
+    int low = 0;
+    int high = n - 1;
+
+    while (low <= high) {
+        int mid = low + (high - low) / 2;
+
+        if (arr[mid] == key)
+            return 1;
+
+        if (arr[mid] < key)
+            low = mid + 1;
+        else
+            high = mid - 1;
+    }
+
+    return 0;
+}
+
+/*
+   Recursively choose k-1 elements.
+   For the last element, use binary search.
+*/
+int kSum(int arr[], int n, int k, int target, int start) {
+
+    // Base case: choose one element
+    if (k == 1) {
+        return binarySearch(arr + start, n - start, target);
+    }
+
+    // Try every possible element
+    for (int i = start; i <= n - k; i++) {
+
+        if (kSum(arr, n, k - 1,
+                 target - arr[i], i + 1)) {
+            return 1;
+        }
+    }
+
+    return 0;
+}
+
+int main() {
+    int n, k, T;
+
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    int arr[n];
+
+    printf("Enter elements:\n");
+    for (int i = 0; i < n; i++) {
+        scanf("%d", &arr[i]);
+    }
+
+    printf("Enter k: ");
+    scanf("%d", &k);
+
+    printf("Enter target T: ");
+    scanf("%d", &T);
+
+    if (k > n || k <= 0) {
+        printf("Invalid value of k.\n");
+        return 0;
+    }
+
+    // Sort the array
+    qsort(arr, n, sizeof(int), compare);
+
+    if (kSum(arr, n, k, T, 0))
+        printf("\nYes, %d elements can make sum %d.\n", k, T);
+    else
+        printf("\nNo, %d elements can make sum %d.\n", k, T);
+
+    return 0;
+}
