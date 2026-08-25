@@ -1,5 +1,60 @@
 #include <stdio.h>
 #include <stdlib.h>
-typedef struct{int time,type;} Event;
-int cmp(const void*a,const void*b){const Event*x=a,*y=b;return x->time-y->time;}
-int main(){int n;scanf("%d",&n);Event*e=malloc(2*n*sizeof(Event));for(int i=0;i<n;i++){int a,b;scanf("%d %d",&a,&b);e[2*i]=(Event){a,1};e[2*i+1]=(Event){b,-1};}qsort(e,2*n,sizeof(Event),cmp);int cur=0,mx=0,t=0;for(int i=0;i<2*n;i++){cur+=e[i].type;if(cur>mx){mx=cur;t=e[i].time;}}printf("Maximum people: %d\nTime: %d\n",mx,t);free(e);return 0;}
+
+struct Event {
+    int time;
+    int type;
+};
+
+int compare(const void *a, const void *b) {
+    struct Event *e1 = (struct Event *)a;
+    struct Event *e2 = (struct Event *)b;
+
+    return e1->time - e2->time;
+}
+
+int main() {
+    int n;
+
+    printf("Enter number of people: ");
+    scanf("%d", &n);
+
+    struct Event events[2 * n];
+
+    printf("Enter entry and exit time:\n");
+
+    for (int i = 0; i < n; i++) {
+        int entry, exit;
+
+        printf("Person %d: ", i + 1);
+        scanf("%d %d", &entry, &exit);
+
+        events[2 * i].time = entry;
+        events[2 * i].type = 1;      // Entry
+
+        events[2 * i + 1].time = exit;
+        events[2 * i + 1].type = -1; // Exit
+    }
+
+    // Sort events according to time
+    qsort(events, 2 * n, sizeof(struct Event), compare);
+
+    int current = 0;
+    int maximum = 0;
+    int maxTime = 0;
+
+    for (int i = 0; i < 2 * n; i++) {
+
+        current += events[i].type;
+
+        if (current > maximum) {
+            maximum = current;
+            maxTime = events[i].time;
+        }
+    }
+
+    printf("\nMaximum number of people present = %d\n", maximum);
+    printf("Time when maximum people were present = %d\n", maxTime);
+
+    return 0;
+}
