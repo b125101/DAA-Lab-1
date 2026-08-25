@@ -1,5 +1,64 @@
 #include <stdio.h>
 #include <stdlib.h>
-typedef struct{int l,r;} Interval;
-int cmp(const void*a,const void*b){const Interval*x=a,*y=b;return x->l-y->l;}
-int main(){int n;scanf("%d",&n);Interval*a=malloc(n*sizeof(Interval));for(int i=0;i<n;i++)scanf("%d %d",&a[i].l,&a[i].r);qsort(a,n,sizeof(Interval),cmp);Interval*res=malloc(n*sizeof(Interval));int m=0;for(int i=0;i<n;i++){if(m==0||a[i].l>res[m-1].r){res[m++]=a[i];}else if(a[i].r>res[m-1].r)res[m-1].r=a[i].r;}for(int i=0;i<m;i++)printf("(%d, %d)\n",res[i].l,res[i].r);free(a);free(res);return 0;}
+
+struct Interval {
+    int start;
+    int end;
+};
+
+int compare(const void *a, const void *b) {
+    struct Interval *i1 = (struct Interval *)a;
+    struct Interval *i2 = (struct Interval *)b;
+
+    return i1->start - i2->start;
+}
+
+int main() {
+    int n;
+
+    printf("Enter number of intervals: ");
+    scanf("%d", &n);
+
+    struct Interval arr[n];
+
+    printf("Enter intervals:\n");
+
+    for (int i = 0; i < n; i++) {
+        printf("Interval %d: ", i + 1);
+        scanf("%d %d", &arr[i].start, &arr[i].end);
+    }
+
+    // Sort intervals according to starting point
+    qsort(arr, n, sizeof(struct Interval), compare);
+
+    printf("\nMerged intervals:\n");
+
+    int currentStart = arr[0].start;
+    int currentEnd = arr[0].end;
+
+    for (int i = 1; i < n; i++) {
+
+        // Check whether intervals overlap
+        if (arr[i].start <= currentEnd) {
+
+            // Extend the current interval
+            if (arr[i].end > currentEnd) {
+                currentEnd = arr[i].end;
+            }
+
+        } else {
+
+            // Print completed interval
+            printf("(%d, %d)\n", currentStart, currentEnd);
+
+            // Start a new interval
+            currentStart = arr[i].start;
+            currentEnd = arr[i].end;
+        }
+    }
+
+    // Print last interval
+    printf("(%d, %d)\n", currentStart, currentEnd);
+
+    return 0;
+}
